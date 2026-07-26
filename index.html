@@ -338,6 +338,96 @@
     width:100%; padding:12px 0;
     color:var(--ink);
   }
+
+  /* ---------- Sleek M-Pesa phone field ---------- */
+  .phone-field{
+    display:flex;
+    align-items:center;
+    gap:0;
+    background:linear-gradient(180deg, #FFFFFF, var(--cream));
+    border:2px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:4px 16px 4px 16px;
+    margin-bottom:6px;
+    transition:border-color .18s ease, box-shadow .18s ease;
+    position:relative;
+  }
+  .phone-field:focus-within{
+    border-color:var(--teal);
+    box-shadow:0 0 0 4px rgba(31,138,110,0.12);
+  }
+  .phone-field.invalid{
+    border-color:#E85D75;
+  }
+  .phone-field.invalid:focus-within{
+    box-shadow:0 0 0 4px rgba(232,93,117,0.12);
+  }
+  .phone-icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:rgba(31,138,110,0.12);
+    color:var(--teal);
+    flex-shrink:0;
+    transition:background .18s ease, color .18s ease;
+  }
+  .phone-field.invalid .phone-icon{
+    background:rgba(232,93,117,0.14);
+    color:#E85D75;
+  }
+  .phone-prefix{
+    font-family:'Baloo 2';
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    padding:0 10px 0 10px;
+    white-space:nowrap;
+    letter-spacing:.01em;
+  }
+  .phone-divider{
+    width:1px;
+    height:22px;
+    background:var(--line);
+    flex-shrink:0;
+  }
+  .phone-field input[type=tel]{
+    border:none;background:transparent;outline:none;
+    font-family:'DM Sans';font-weight:600;font-size:16px;
+    letter-spacing:.03em;
+    width:100%; padding:14px 10px;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .phone-field input[type=tel]::placeholder{
+    color:var(--brown-soft);
+    font-weight:500;
+    letter-spacing:.02em;
+  }
+  .phone-status{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;height:22px;
+    border-radius:50%;
+    flex-shrink:0;
+    font-size:12px;
+    opacity:0;
+    transform:scale(0.6);
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .phone-status.show{opacity:1; transform:scale(1);}
+  .phone-status.valid{background:var(--teal); color:#fff;}
+  .phone-status.invalid{background:#E85D75; color:#fff;}
+  .phone-hint{
+    font-size:12px;
+    color:var(--brown-soft);
+    margin:0 0 20px 4px;
+    transition:color .15s ease;
+  }
+  .phone-hint.invalid{color:#E85D75; font-weight:600;}
+
   textarea{
     width:100%;
     border:2px solid var(--line);
@@ -548,10 +638,18 @@
       </div>
 
       <span class="label">M-Pesa phone number</span>
-      <div class="custom-row" style="padding-left:16px;">
-        <span style="font-size:14px;">🇰🇪</span>
-        <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX" inputmode="numeric">
+      <div class="phone-field" id="phoneField">
+        <span class="phone-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="phone-prefix">🇰🇪 +254</span>
+        <span class="phone-divider"></span>
+        <input type="tel" id="phoneNumber" placeholder="712 345 678" inputmode="numeric" maxlength="11" autocomplete="tel-national">
+        <span class="phone-status" id="phoneStatus"></span>
       </div>
+      <p class="phone-hint" id="phoneHint">We'll send an M-Pesa prompt to this number.</p>
 
       <span class="label">Note for the team (optional)</span>
       <textarea id="note" placeholder="Say something nice, or just leave a ☕ emoji..."></textarea>
@@ -669,7 +767,51 @@
   const supportBtn = document.getElementById('supportBtn');
   const supportBtnLabel = document.getElementById('supportBtnLabel');
   const phoneInput = document.getElementById('phoneNumber');
+  const phoneField = document.getElementById('phoneField');
+  const phoneStatus = document.getElementById('phoneStatus');
+  const phoneHint = document.getElementById('phoneHint');
   const secureNote = document.getElementById('secureNote');
+
+  function isValidKenyanNumber(digits){
+    // Expects 9 digits after the +254 prefix, starting with 7 or 1 (Safaricom/Airtel/Telkom ranges)
+    return /^[71]\d{8}$/.test(digits);
+  }
+
+  function formatPhoneDisplay(digits){
+    // e.g. 712345678 -> "712 345 678"
+    return digits.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, a, b, c) =>
+      [a, b, c].filter(Boolean).join(' ')
+    );
+  }
+
+  phoneInput.addEventListener('input', () => {
+    const digits = phoneInput.value.replace(/\D/g, '').slice(0, 9);
+    phoneInput.value = formatPhoneDisplay(digits);
+
+    if (digits.length === 0){
+      phoneField.classList.remove('invalid');
+      phoneStatus.className = 'phone-status';
+      phoneHint.textContent = "We'll send an M-Pesa prompt to this number.";
+      phoneHint.classList.remove('invalid');
+      return;
+    }
+
+    const valid = isValidKenyanNumber(digits);
+    phoneField.classList.toggle('invalid', digits.length === 9 && !valid);
+
+    if (digits.length === 9){
+      phoneStatus.className = `phone-status show ${valid ? 'valid' : 'invalid'}`;
+      phoneStatus.textContent = valid ? '✓' : '!';
+      phoneHint.textContent = valid
+        ? "We'll send an M-Pesa prompt to this number."
+        : 'That doesn\u2019t look like a valid Safaricom/Airtel number.';
+      phoneHint.classList.toggle('invalid', !valid);
+    } else {
+      phoneStatus.className = 'phone-status';
+      phoneHint.textContent = "We'll send an M-Pesa prompt to this number.";
+      phoneHint.classList.remove('invalid');
+    }
+  });
 
   function showToast(message, duration = 3200){
     toast.textContent = message;
@@ -726,11 +868,13 @@
   }
 
   supportBtn.addEventListener('click', async () => {
-    const phone = phoneInput.value.trim();
+    const digits = phoneInput.value.replace(/\D/g, '');
+    const phone = '254' + digits;
     const note = document.getElementById('note').value.trim();
 
-    if (!phone || phone.replace(/\D/g, '').length < 9){
+    if (!isValidKenyanNumber(digits)){
       showToast('📱 Enter a valid M-Pesa phone number first.', 3000);
+      phoneField.classList.add('invalid');
       phoneInput.focus();
       return;
     }
