@@ -1,498 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Buy Studoke a Coffee</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --espresso: #2b1b12;
-    --espresso-dark: #1c110a;
-    --paper: #faf6ee;
-    --paper-dim: #efe6d4;
-    --cherry: #c1272d;
-    --butter: #e8b23d;
-    --steam: #a9a29c;
-    --ink: #2b1b12;
-    --radius-ticket: 4px;
-  }
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matata Shop</title>
 
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--espresso-dark);
-    color: var(--ink);
-    font-family: 'Space Grotesk', sans-serif;
-    min-height: 100vh;
-  }
-
-  body {
-    background-image:
-      radial-gradient(circle at 15% 20%, rgba(232,178,61,0.06), transparent 40%),
-      radial-gradient(circle at 85% 75%, rgba(193,39,45,0.07), transparent 45%);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 56px 20px 90px;
-  }
-
-  .counter {
-    width: 100%;
-    max-width: 920px;
-    display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: 48px;
-    align-items: start;
-  }
-
-  @media (max-width: 800px){
-    .counter { grid-template-columns: 1fr; gap: 36px; }
-  }
-
-  /* ---------- Left: brand / intro ---------- */
-  .brand-eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.16em;
-    color: var(--butter);
-    text-transform: uppercase;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand-eyebrow::before {
-    content: "";
-    width: 22px;
-    height: 1px;
-    background: var(--butter);
-    display: inline-block;
-  }
-
-  .brand-title {
-    color: var(--paper);
-    font-size: clamp(38px, 5.4vw, 58px);
-    line-height: 1.02;
-    font-weight: 700;
-    margin: 0 0 18px;
-    letter-spacing: -0.01em;
-  }
-  .brand-title em {
-    font-style: normal;
-    color: var(--cherry);
-    text-decoration: underline;
-    text-decoration-color: rgba(193,39,45,0.5);
-    text-decoration-thickness: 3px;
-    text-underline-offset: 6px;
-  }
-
-  .brand-copy {
-    color: rgba(250,246,238,0.72);
-    font-size: 16px;
-    line-height: 1.65;
-    max-width: 46ch;
-    margin: 0 0 30px;
-  }
-
-  .steam-stat {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    color: var(--steam);
-    border-top: 1px dashed rgba(169,162,156,0.35);
-    padding-top: 16px;
-    margin-top: 8px;
-  }
-  .steam-stat b { color: var(--butter); font-weight: 600; }
-  .steam-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--cherry);
-    box-shadow: 0 0 0 3px rgba(193,39,45,0.18);
-    flex-shrink: 0;
-  }
-
-  .avatar-row {
-    display: flex;
-    margin-top: 26px;
-  }
-  .avatar-row span {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    border: 2px solid var(--espresso-dark);
-    margin-left: -10px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--espresso-dark);
-    font-weight: 700;
-  }
-  .avatar-row span:first-child { margin-left: 0; }
-  .avatar-row span:nth-child(1){ background: var(--butter); }
-  .avatar-row span:nth-child(2){ background: var(--paper); }
-  .avatar-row span:nth-child(3){ background: #d9a6a8; }
-  .avatar-row span:nth-child(4){ background: var(--steam); }
-  .avatar-row .more {
-    background: transparent;
-    color: var(--paper);
-    border: 1px dashed rgba(250,246,238,0.4);
-    font-weight: 400;
-  }
-
-  /* ---------- Right: the receipt ---------- */
-  .ticket-wrap {
-    position: relative;
-    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.45));
-  }
-
-  .ticket {
-    background: var(--paper);
-    padding: 34px 30px 26px;
-    position: relative;
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--espresso);
-    clip-path: polygon(
-      0% 10px, 4% 0%, 8% 10px, 12% 0%, 16% 10px, 20% 0%, 24% 10px, 28% 0%, 32% 10px, 36% 0%, 40% 10px, 44% 0%, 48% 10px, 52% 0%, 56% 10px, 60% 0%, 64% 10px, 68% 0%, 72% 10px, 76% 0%, 80% 10px, 84% 0%, 88% 10px, 92% 0%, 96% 10px, 100% 0%,
-      100% calc(100% - 10px), 96% 100%, 92% calc(100% - 10px), 88% 100%, 84% calc(100% - 10px), 80% 100%, 76% calc(100% - 10px), 72% 100%, 68% calc(100% - 10px), 64% 100%, 60% calc(100% - 10px), 56% 100%, 52% calc(100% - 10px), 48% 100%, 44% calc(100% - 10px), 40% 100%, 36% calc(100% - 10px), 32% 100%, 28% calc(100% - 10px), 24% 100%, 20% calc(100% - 10px), 16% 100%, 12% calc(100% - 10px), 8% 100%, 4% calc(100% - 10px), 0% 100%
-    );
-    background-image:
-      repeating-linear-gradient(180deg, rgba(43,27,18,0.025) 0px, rgba(43,27,18,0.025) 1px, transparent 1px, transparent 3px);
-  }
-
-  .ticket-head {
-    text-align: center;
-    margin-bottom: 18px;
-  }
-  .ticket-head .logo-mark {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 0.03em;
-  }
-  .ticket-head .logo-mark span { color: var(--cherry); }
-  .ticket-head .sub {
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    color: var(--steam);
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-
-  .rule {
-    border: none;
-    border-top: 1px dashed rgba(43,27,18,0.3);
-    margin: 16px 0;
-  }
-
-  .field-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--steam);
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .tiers {
-    display: grid;
-    gap: 8px;
-    margin-bottom: 18px;
-  }
-  .tier {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border: 1px solid rgba(43,27,18,0.18);
-    background: transparent;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    color: var(--espresso);
-    text-align: left;
-    transition: border-color .15s ease, background .15s ease, transform .08s ease;
-  }
-  .tier:hover { border-color: rgba(43,27,18,0.4); }
-  .tier .name { display: flex; align-items: center; gap: 8px; }
-  .tier .name .qty { color: var(--steam); }
-  .tier .price { font-weight: 600; }
-  .tier.active {
-    background: var(--espresso);
-    border-color: var(--espresso);
-    color: var(--paper);
-  }
-  .tier.active .qty { color: var(--butter); }
-  .tier.active .price { color: var(--butter); }
-
-  .custom-row {
-    display: flex;
-    align-items: center;
-    border: 1px dashed rgba(43,27,18,0.35);
-    padding: 10px 12px;
-    margin-bottom: 20px;
-    gap: 8px;
-  }
-  .custom-row span.pfx { color: var(--steam); font-size: 13px; }
-  .custom-row input[type="number"] {
-    border: none;
-    background: transparent;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    width: 100%;
-    outline: none;
-    color: var(--espresso);
-  }
-
-  .note-area textarea {
-    width: 100%;
-    resize: vertical;
-    min-height: 64px;
-    border: 1px solid rgba(43,27,18,0.18);
-    padding: 10px 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12.5px;
-    background: rgba(43,27,18,0.02);
-    color: var(--espresso);
-    outline: none;
-    margin-bottom: 20px;
-  }
-  .note-area textarea::placeholder { color: var(--steam); }
-  .note-area textarea:focus, .custom-row:has(input:focus) {
-    border-color: var(--cherry);
-  }
-
-  .total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 22px;
-    font-size: 13px;
-  }
-  .total-row .label { color: var(--steam); letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; }
-  .total-row .amount { font-size: 22px; font-weight: 700; }
-
-  .pay-btn {
-    width: 100%;
-    background: var(--cherry);
-    color: var(--paper);
-    border: none;
-    padding: 16px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: transform .08s ease, background .15s ease;
-  }
-  .pay-btn:hover { background: #a81f24; }
-  .pay-btn:active { transform: scale(0.98); }
-  .pay-btn:focus-visible {
-    outline: 3px solid var(--butter);
-    outline-offset: 2px;
-  }
-
-  .fine-print {
-    text-align: center;
-    font-size: 9.5px;
-    color: var(--steam);
-    letter-spacing: 0.04em;
-    margin-top: 16px;
-    line-height: 1.6;
-  }
-
-  /* Stamp confirmation */
-  .stamp {
-    position: absolute;
-    top: 44%;
-    left: 50%;
-    width: 150px;
-    height: 150px;
-    border: 5px solid var(--cherry);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--cherry);
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transform: translate(-50%, -50%) rotate(-14deg) scale(2.4);
-    opacity: 0;
-    pointer-events: none;
-    mix-blend-mode: multiply;
-    transition: opacity .18s ease, transform .28s cubic-bezier(.2,1.4,.4,1);
-  }
-  .stamp.show {
-    opacity: 0.88;
-    transform: translate(-50%, -50%) rotate(-14deg) scale(1);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .stamp, .pay-btn { transition: none; }
-  }
-
-  .sr-only {
-    position: absolute; width: 1px; height: 1px;
-    overflow: hidden; clip: rect(0,0,0,0);
-  }
-</style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
+    <div class="container">
+        <header class="pb-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94"
+                    role="img">
+                    <title>Bootstrap</title>
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z"
+                        fill="currentColor"></path>
+                </svg>
+                <span class="fs-4">Matata Shop</span>
+            </a>
+        </header>
 
-  <div class="counter">
+        <!-- products -->
+        <div class="row container mt-4 mx-auto" id="products"></div>
 
-    <!-- Left: intro -->
-    <div class="intro">
-      <div class="brand-eyebrow">Studoke Support Counter</div>
-      <h1 class="brand-title">Keep the study<br><em>lights on</em>.</h1>
-      <p class="brand-copy">
-        Studoke runs on late nights, spare change, and an unreasonable amount of coffee.
-        Every cup you buy goes straight toward new flashcard decks, faster sync, and
-        keeping the servers awake past 2am.
-      </p>
+        <button data-bs-toggle="modal" data-bs-target="#cartModal"
+            class="btn btn-danger btn-block btn-lg mx-auto float">Cart Ksh. <span id="cartValue">0.00</span></button>
 
-      <div class="steam-stat">
-        <span class="steam-dot"></span>
-        <span><b>1,204</b> coffees bought this month</span>
-      </div>
-
-      <div class="avatar-row" aria-hidden="true">
-        <span>JM</span>
-        <span>KA</span>
-        <span>RT</span>
-        <span>+</span>
-        <span class="more">482</span>
-      </div>
     </div>
 
-    <!-- Right: the receipt / order ticket -->
-    <div class="ticket-wrap">
-      <form class="ticket" id="coffee-form">
-        <div class="ticket-head">
-          <div class="logo-mark">STUDOKE<span>.</span></div>
-          <div class="sub">Order Ticket · No. 0482</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/app.js"></script>
+
+    <div class="modal fade" id="cartModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Cart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="err"></div>
+                    <table role="table" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>@</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartItems"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">Total</td>
+                                <td id="cartTotal">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <form action="" class="form m-5">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <img style="max-width: 80%" src="assets/img/mpesalogo.png" alt="mpesa logo">
+                        </div>
+                        <div class="form-group col-sm-7 mb-4">
+                            <label for="phone">Enter phone to Pay</label>
+                            <input type="number" id="phone" class="form-control">
+                            <div id="phoneErr"></div>
+                        </div>
+                        <button id="paynow" type="button" class="btn btn-lg btn-success">Pay Now</button>
+                    </div>
+
+                </form>
+            </div>
         </div>
-
-        <hr class="rule" />
-
-        <span class="field-label">Pick a size</span>
-        <div class="tiers" role="radiogroup" aria-label="Coffee size">
-          <button type="button" class="tier active" data-amount="3" role="radio" aria-checked="true">
-            <span class="name"><span class="qty">01×</span> Espresso Shot</span>
-            <span class="price">$3</span>
-          </button>
-          <button type="button" class="tier" data-amount="5" role="radio" aria-checked="false">
-            <span class="name"><span class="qty">01×</span> House Latte</span>
-            <span class="price">$5</span>
-          </button>
-          <button type="button" class="tier" data-amount="10" role="radio" aria-checked="false">
-            <span class="name"><span class="qty">01×</span> Cold Brew, Large</span>
-            <span class="price">$10</span>
-          </button>
-        </div>
-
-        <span class="field-label">Or write your own amount</span>
-        <div class="custom-row">
-          <span class="pfx">$</span>
-          <input type="number" id="custom-amount" min="1" step="1" placeholder="Custom total" />
-        </div>
-
-        <div class="note-area">
-          <span class="field-label">Note for the team (optional)</span>
-          <textarea id="note" maxlength="180" placeholder="e.g. thanks for the new flashcard mode!"></textarea>
-        </div>
-
-        <div class="total-row">
-          <span class="label">Total due</span>
-          <span class="amount" id="total-amount">$3.00</span>
-        </div>
-
-        <button type="submit" class="pay-btn" id="pay-btn">Send the coffee</button>
-
-        <p class="fine-print">Secure checkout · Receipt emailed to you<br />No account needed</p>
-
-        <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
-        <span class="sr-only" id="status-live" role="status" aria-live="polite"></span>
-      </form>
     </div>
-
-  </div>
-
-<script>
-(function(){
-  const tiers = document.querySelectorAll('.tier');
-  const customInput = document.getElementById('custom-amount');
-  const totalEl = document.getElementById('total-amount');
-  const form = document.getElementById('coffee-form');
-  const payBtn = document.getElementById('pay-btn');
-  const stamp = document.getElementById('stamp');
-  const statusLive = document.getElementById('status-live');
-
-  let selected = 3;
-
-  function setTotal(v){
-    const num = Math.max(1, Number(v) || 0);
-    totalEl.textContent = '$' + num.toFixed(2);
-  }
-
-  tiers.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tiers.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-checked','false'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-checked','true');
-      selected = Number(btn.dataset.amount);
-      customInput.value = '';
-      setTotal(selected);
-    });
-  });
-
-  customInput.addEventListener('input', () => {
-    if (customInput.value) {
-      tiers.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-checked','false'); });
-      selected = Number(customInput.value);
-      setTotal(selected);
-    } else {
-      setTotal(selected);
-    }
-  });
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    // --- Payment integration point -------------------------------------
-    // This is a static demo: no real charge happens here.
-    // To take real payments, swap this block for a call to your
-    // payment provider, e.g. a Stripe Checkout Session or a
-    // Buy Me a Coffee / Ko-fi widget, then handle success/failure below.
-    // ---------------------------------------------------------------------
-
-    const amount = Number(customInput.value || selected);
-    const note = document.getElementById('note').value.trim();
-
-    payBtn.disabled = true;
-    payBtn.textContent = 'Brewing…';
-
-    setTimeout(() => {
-      stamp.classList.add('show');
-      payBtn.textContent = 'Sent — thank you!';
-      statusLive.textContent = 'Payment confirmed. Thank you for the $' + amount.toFixed(2) + ' coffee' + (note ? ' and your note.' : '.');
-    }, 550);
-  });
-
-  setTotal(selected);
-})();
-</script>
-
 </body>
 </html>
