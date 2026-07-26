@@ -547,6 +547,12 @@
         <input type="number" id="customAmount" placeholder="Custom amount" min="1">
       </div>
 
+      <span class="label">M-Pesa phone number</span>
+      <div class="custom-row" style="padding-left:16px;">
+        <span style="font-size:14px;">🇰🇪</span>
+        <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX" inputmode="numeric">
+      </div>
+
       <span class="label">Note for the team (optional)</span>
       <textarea id="note" placeholder="Say something nice, or just leave a ☕ emoji..."></textarea>
 
@@ -555,8 +561,8 @@
         <span class="t-amount" id="totalAmount">Ksh 500</span>
       </div>
 
-      <button class="support-btn" id="supportBtn">Send the coffee ☕</button>
-      <p class="secure-note">Secure checkout · Receipt emailed to you · No account needed</p>
+      <button class="support-btn" id="supportBtn"><span id="supportBtnLabel">Send the coffee ☕</span></button>
+      <p class="secure-note" id="secureNote">Secure checkout via M-Pesa · Powered by Safaricom Daraja</p>
     </div>
   </div>
 </section>
@@ -652,11 +658,111 @@
     totalAmount.textContent = 'Ksh ' + Math.round(currentPrice).toLocaleString('en-KE');
   }
 
-  // Submit
+  // ---------------------------------------------------------------------
+  // M-Pesa checkout
+  // Change this if your backend runs somewhere other than the same origin
+  // that's serving this page (e.g. during local dev without a shared port).
+  // ---------------------------------------------------------------------
+  const API_BASE = ''; // '' = same origin as this page. e.g. 'http://localhost:3000' if different.
+
   const toast = document.getElementById('toast');
-  document.getElementById('supportBtn').addEventListener('click', () => {
+  const supportBtn = document.getElementById('supportBtn');
+  const supportBtnLabel = document.getElementById('supportBtnLabel');
+  const phoneInput = document.getElementById('phoneNumber');
+  const secureNote = document.getElementById('secureNote');
+
+  function showToast(message, duration = 3200){
+    toast.textContent = message;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3200);
+    setTimeout(() => toast.classList.remove('show'), duration);
+  }
+
+  function setButtonState(state){
+    // state: 'idle' | 'sending' | 'waiting' | 'success' | 'failed'
+    supportBtn.disabled = state === 'sending' || state === 'waiting';
+    supportBtn.style.opacity = supportBtn.disabled ? '0.7' : '1';
+    supportBtn.style.cursor = supportBtn.disabled ? 'not-allowed' : 'pointer';
+
+    const labels = {
+      idle: 'Send the coffee ☕',
+      sending: 'Sending request…',
+      waiting: 'Check your phone 📲',
+      success: 'Coffee received! ☕✅',
+      failed: 'Send the coffee ☕',
+    };
+    supportBtnLabel.textContent = labels[state];
+  }
+
+  async function pollStatus(checkoutRequestId, attemptsLeft = 20){
+    if (attemptsLeft <= 0){
+      setButtonState('failed');
+      showToast('⏱️ Still waiting on M-Pesa — check your phone or try again.', 4000);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/mpesa/status/${checkoutRequestId}`);
+      const data = await res.json();
+
+      if (data.status === 'Success'){
+        setButtonState('success');
+        showToast(`🎉 Asante! Ksh ${Number(data.confirmedAmount || currentPrice).toLocaleString('en-KE')} received — TechFlare Africa says cheers!`, 5000);
+        setTimeout(() => setButtonState('idle'), 5000);
+        return;
+      }
+
+      if (data.status === 'Failed'){
+        setButtonState('failed');
+        showToast(`❌ ${data.resultDesc || 'Payment was not completed.'}`, 4500);
+        return;
+      }
+
+      // Still Pending — poll again in 3 seconds
+      setTimeout(() => pollStatus(checkoutRequestId, attemptsLeft - 1), 3000);
+    } catch (err) {
+      console.error('Status check failed:', err);
+      setTimeout(() => pollStatus(checkoutRequestId, attemptsLeft - 1), 3000);
+    }
+  }
+
+  supportBtn.addEventListener('click', async () => {
+    const phone = phoneInput.value.trim();
+    const note = document.getElementById('note').value.trim();
+
+    if (!phone || phone.replace(/\D/g, '').length < 9){
+      showToast('📱 Enter a valid M-Pesa phone number first.', 3000);
+      phoneInput.focus();
+      return;
+    }
+    if (currentPrice < 1){
+      showToast('☕ Pick a size or enter an amount first.', 3000);
+      return;
+    }
+
+    setButtonState('sending');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/mpesa/stkpush`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, amount: currentPrice, note }),
+      });
+      const data = await res.json();
+
+      if (!data.success){
+        setButtonState('failed');
+        showToast(`❌ ${data.error || 'Could not start the payment.'}`, 4000);
+        return;
+      }
+
+      setButtonState('waiting');
+      showToast('📲 Check your phone and enter your M-Pesa PIN.', 4000);
+      pollStatus(data.checkoutRequestId);
+    } catch (err) {
+      console.error('STK push request failed:', err);
+      setButtonState('failed');
+      showToast('❌ Could not reach the payment server.', 4000);
+    }
   });
 </script>
 
